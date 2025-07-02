@@ -1,7 +1,8 @@
 import click
-from git_reader import get_recent_commits
-from agent import generate_standup
+from git_utils import get_recent_commits
+from openai_client import generate_standup
 from utils import copy_to_clipboard
+from formatter import format_standup_output, format_clipboard_message
 
 
 @click.group()
@@ -24,20 +25,13 @@ def generate(since):
     # Generate standup using AI
     standup_update = generate_standup(commits, notes)
     
-    # Print the generated standup with clean formatting
-    print("\n" + "=" * 60)
-    print("📋 YOUR STANDUP UPDATE")
-    print("=" * 60)
-    print()
-    print(standup_update)
-    print()
-    print("=" * 60)
+    # Format and print the standup
+    formatted_output = format_standup_output(standup_update)
+    print(formatted_output)
     
-    # Copy to clipboard
-    if copy_to_clipboard(standup_update):
-        print("✅ Standup copied to clipboard!")
-    else:
-        print("⚠️  Could not copy to clipboard")
+    # Copy to clipboard and show result
+    clipboard_success = copy_to_clipboard(standup_update)
+    print(format_clipboard_message(clipboard_success))
 
 
 if __name__ == '__main__':
